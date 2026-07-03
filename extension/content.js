@@ -51,10 +51,12 @@
 
     // --- I18N MANAGER ---
     class I18nManager {
-        constructor(config, cachedDict = null) {
+        constructor(config, cachedDict) {
             this.config = config;
-            this.ui = DICTIONARIES[config.uiLang].ui;
+            this.uiLang = config.uiLang || 'en';
+            this.ui = DICTIONARIES[this.uiLang].ui;
             
+            let strongPosKeywords = [];
             let posKeywords = [];
             let negKeywords = [];
             let feedLabels = [];
@@ -65,14 +67,17 @@
 
             config.filterLangs.forEach(lang => {
                 if (cachedDict && cachedDict[lang]) {
+                    if (cachedDict[lang].strong_positive) strongPosKeywords = strongPosKeywords.concat(cachedDict[lang].strong_positive);
                     posKeywords = posKeywords.concat(cachedDict[lang].positive);
                     negKeywords = negKeywords.concat(cachedDict[lang].negative);
                 } else if (DICTIONARIES[lang]) {
+                    if (DICTIONARIES[lang].strong_positive) strongPosKeywords = strongPosKeywords.concat(DICTIONARIES[lang].strong_positive);
                     posKeywords = posKeywords.concat(DICTIONARIES[lang].positive);
                     negKeywords = negKeywords.concat(DICTIONARIES[lang].negative);
                 }
             });
 
+            this.strongPosRegex = strongPosKeywords.length > 0 ? new RegExp(`(?:${strongPosKeywords.join('|')})`, 'i') : null;
             this.posRegex = new RegExp(`(?:${posKeywords.join('|')})`, 'i');
             this.negRegex = new RegExp(`(?:${negKeywords.join('|')})`, 'i');
             this.feedLabels = [...new Set(feedLabels)].map(l => l.toLowerCase());
@@ -84,7 +89,8 @@
 
         isVacancy(text) {
             const cleanText = text.replace(/#/g, '');
-            return this.posRegex.test(cleanText) && !this.negRegex.test(cleanText);
+            const isStrong = this.strongPosRegex ? this.strongPosRegex.test(cleanText) : false;
+            return isStrong || (this.posRegex.test(cleanText) && !this.negRegex.test(cleanText));
         }
         
         isFeedPostLabel(text) {
