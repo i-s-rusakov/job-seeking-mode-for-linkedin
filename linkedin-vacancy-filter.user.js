@@ -1,10 +1,10 @@
 // ==UserScript==
-// @name         LinkedIn Vacancy Filter
-// @name:ru      LinkedIn Фильтр Вакансий
-// @name:es      LinkedIn Filtro de Vacantes
-// @name:de      LinkedIn Stellenangebote Filter
-// @name:fr      LinkedIn Filtre de Postes Vacants
-// @name:zh      LinkedIn 职位空缺过滤器
+// @name         LinkedIn Job Seeking Mode
+// @name:ru      LinkedIn Режим Поиска Работы
+// @name:es      LinkedIn Modo Búsqueda de Empleo
+// @name:de      LinkedIn Jobsuche-Modus
+// @name:fr      LinkedIn Mode Recherche d'Emploi
+// @name:zh      LinkedIn 求职模式
 // @namespace    https://github.com/
 // @version      1.0
 // @description  Hide non-vacancy posts from LinkedIn feed with multi-language support
@@ -29,7 +29,7 @@
     
     const DEBUG_MODE = false;
     const log = (...args) => {
-        if (DEBUG_MODE) console.warn('[LIVF]', ...args);
+        if (DEBUG_MODE) console.warn('[LJSM]', ...args);
     };
 
     // --- DICTIONARIES ---
@@ -134,8 +134,8 @@
             const defaultLang = this.supportedLangs.includes(browserLang) ? browserLang : 'en';
 
             this.config = {
-                uiLang: GM_getValue('livf_uiLang', defaultLang),
-                filterLangs: JSON.parse(GM_getValue('livf_filterLangs', JSON.stringify([defaultLang, 'en']))) // Default to browser lang + EN
+                uiLang: GM_getValue('ljsm_uiLang', defaultLang),
+                filterLangs: JSON.parse(GM_getValue('ljsm_filterLangs', JSON.stringify([defaultLang, 'en']))) // Default to browser lang + EN
             };
             
             // Deduplicate default array
@@ -145,8 +145,8 @@
         save(uiLang, filterLangs) {
             this.config.uiLang = uiLang;
             this.config.filterLangs = filterLangs;
-            GM_setValue('livf_uiLang', uiLang);
-            GM_setValue('livf_filterLangs', JSON.stringify(filterLangs));
+            GM_setValue('ljsm_uiLang', uiLang);
+            GM_setValue('ljsm_filterLangs', JSON.stringify(filterLangs));
             window.location.reload(); // Reload to apply changes immediately
         }
 
