@@ -23,7 +23,9 @@
 // @grant        GM_log
 // @grant        GM_getValue
 // @grant        GM_setValue
+// @grant        GM_xmlhttpRequest
 // @grant        GM_registerMenuCommand
+// @connect      raw.githubusercontent.com
 // @license      MIT
 // ==/UserScript==
 
@@ -35,6 +37,54 @@
         if (DEBUG_MODE) console.warn('[LJSM]', ...args);
     };
 
+    // --- DICTIONARY SYNC ---
+    const DICT_URL = 'https://raw.githubusercontent.com/i-s-rusakov/job-seeking-mode-for-linkedin/master/dictionaries.json';
+    const SYNC_INTERVAL = 3 * 60 * 60 * 1000; // 3 hours
+
+    function syncDictionariesIfNeeded(config, callback) {
+        if (!config.autoUpdateDict) {
+            GM_setValue('ljsm_sync_status', 'disabled');
+            callback(null);
+            return;
+        }
+        
+        const now = Date.now();
+        const lastSync = GM_getValue('ljsm_dict_last_sync', 0);
+        const cachedDict = GM_getValue('ljsm_cached_dict', null);
+        
+        if (now - lastSync > SYNC_INTERVAL || !cachedDict) {
+            log('Fetching latest dictionaries from GitHub...');
+            GM_xmlhttpRequest({
+                method: "GET",
+                url: DICT_URL,
+                onload: function(response) {
+                    try {
+                        const data = JSON.parse(response.responseText);
+                        GM_setValue('ljsm_dict_last_sync', now);
+                        GM_setValue('ljsm_cached_dict', data);
+                        GM_setValue('ljsm_sync_status', 'ok');
+                        GM_setValue('ljsm_sync_needs_reload', true);
+                        log('Dictionaries updated successfully.');
+                        callback(data);
+                    } catch (e) {
+                        console.error('[LJSM] Failed to parse dictionaries:', e);
+                        GM_setValue('ljsm_sync_status', 'error');
+                        callback(cachedDict);
+                    }
+                },
+                onerror: function(e) {
+                    console.error('[LJSM] Failed to fetch dictionaries:', e);
+                    GM_setValue('ljsm_sync_status', 'error');
+                    callback(cachedDict);
+                }
+            });
+        } else {
+            GM_setValue('ljsm_sync_status', 'ok');
+            GM_setValue('ljsm_sync_needs_reload', false);
+            callback(cachedDict);
+        }
+    }
+
     // --- DICTIONARIES ---
     const DICTIONARIES = {
         en: {
@@ -42,6 +92,11 @@
             ui: {
                 settings_title: "Language Settings",
                 enable_filtering: "Enable Job Seeking Mode",
+                auto_update_dict: "Auto-update keywords from GitHub",
+                sync_status_ok: "Sync Status: Updated",
+                sync_status_error: "Sync Status: Error",
+                sync_status_disabled: "Sync Status: Disabled",
+                reload_required: " (Reload page to apply!)",
                 ui_language: "UI Language",
                 filter_languages: "Filtering Languages",
                 save: "Save",
@@ -51,13 +106,18 @@
                 feed_post_labels: ["feed post", "post"]
             },
             positive: ["hiring", "vacancy", "vacancies", "job opening", "opening", "looking for a", "we are looking for", "join our team", "open role", "open position", "jobs recommended for you"],
-            negative: ["looking for a job", "looking for work", "personal branding", "business opportunity", "open to work", "opentowork", "hire me"]
+            negative: ["looking for a job", "looking for work", "personal branding", "business opportunity", "open to work", "opentowork", "hire me", "#jobsearch", "#resumetips", "#hiringtrends"]
         },
         ru: {
             name: "Русский",
             ui: {
                 settings_title: "Настройки Языков",
                 enable_filtering: "Включить Режим Поиска Работы",
+                auto_update_dict: "Автообновление словарей с GitHub",
+                sync_status_ok: "Синхронизация: Обновлено",
+                sync_status_error: "Синхронизация: Ошибка",
+                sync_status_disabled: "Синхронизация: Отключена",
+                reload_required: " (Перезагрузите для применения!)",
                 ui_language: "Язык интерфейса",
                 filter_languages: "Языки фильтрации",
                 save: "Сохранить",
@@ -67,13 +127,18 @@
                 feed_post_labels: ["пост в ленте", "пост"]
             },
             positive: ["нанимаем", "вакансия", "вакансии", "открыта вакансия", "открытие", "ищем", "мы ищем", "присоединяйтесь к нашей команде", "присоединяйтесь к команде", "открыта роль", "открыта позиция", "открытую позицию", "найм", "в поиске", "рекомендуемые вакансии"],
-            negative: ["ищу работу", "поиск работы", "поискработы", "персональный бренд", "бизнес возможность", "открыт к предложениям", "найми меня"]
+            negative: ["ищу работу", "поиск работы", "поискработы", "персональный бренд", "бизнес возможность", "открыт к предложениям", "найми меня", "#поискработы", "#советыпорезюме", "#трендынайма"]
         },
         es: {
             name: "Español",
             ui: {
                 settings_title: "Configuración de Idiomas",
                 enable_filtering: "Habilitar Modo Búsqueda de Empleo",
+                auto_update_dict: "Actualización automática de GitHub",
+                sync_status_ok: "Sincronización: Actualizado",
+                sync_status_error: "Sincronización: Error",
+                sync_status_disabled: "Sincronización: Deshabilitada",
+                reload_required: " (¡Recarga para aplicar!)",
                 ui_language: "Idioma de UI",
                 filter_languages: "Idiomas de filtrado",
                 save: "Guardar",
@@ -90,6 +155,11 @@
             ui: {
                 settings_title: "Spracheinstellungen",
                 enable_filtering: "Jobsuche-Modus Aktivieren",
+                auto_update_dict: "Auto-Update-Wörterbuch von GitHub",
+                sync_status_ok: "Sync-Status: Aktualisiert",
+                sync_status_error: "Sync-Status: Fehler",
+                sync_status_disabled: "Sync-Status: Deaktiviert",
+                reload_required: " (Neu laden zum Anwenden!)",
                 ui_language: "UI-Sprache",
                 filter_languages: "Filtersprachen",
                 save: "Speichern",
@@ -106,6 +176,11 @@
             ui: {
                 settings_title: "Paramètres de Langue",
                 enable_filtering: "Activer le Mode Recherche d'Emploi",
+                auto_update_dict: "Mise à jour auto des mots-clés (GitHub)",
+                sync_status_ok: "Statut: Mis à jour",
+                sync_status_error: "Statut: Erreur",
+                sync_status_disabled: "Statut: Désactivé",
+                reload_required: " (Recharger pour appliquer!)",
                 ui_language: "Langue de l'interface",
                 filter_languages: "Langues de filtrage",
                 save: "Enregistrer",
@@ -122,6 +197,11 @@
             ui: {
                 settings_title: "语言设置",
                 enable_filtering: "启用求职模式",
+                auto_update_dict: "从GitHub自动更新关键词",
+                sync_status_ok: "同步状态: 已更新",
+                sync_status_error: "同步状态: 错误",
+                sync_status_disabled: "同步状态: 已禁用",
+                reload_required: " (重新加载以应用！)",
                 ui_language: "界面语言",
                 filter_languages: "过滤语言",
                 save: "保存",
@@ -138,34 +218,28 @@
     // --- CONFIG MANAGER ---
     class ConfigManager {
         constructor() {
-            this.supportedLangs = Object.keys(DICTIONARIES);
             const browserLang = (navigator.language || 'en').slice(0, 2).toLowerCase();
-            const defaultLang = this.supportedLangs.includes(browserLang) ? browserLang : 'en';
+            const supportedLangs = Object.keys(DICTIONARIES);
+            const defaultLang = supportedLangs.includes(browserLang) ? browserLang : 'en';
 
             this.config = {
+                autoUpdateDict: GM_getValue('ljsm_auto_update_dict', true),
                 uiLang: GM_getValue('ljsm_uiLang', defaultLang),
-                filterLangs: JSON.parse(GM_getValue('ljsm_filterLangs', JSON.stringify([defaultLang, 'en']))) // Default to browser lang + EN
+                filterLangs: GM_getValue('ljsm_filterLangs', [defaultLang, 'en'])
             };
-            
-            // Deduplicate default array
-            this.config.filterLangs = [...new Set(this.config.filterLangs)];
         }
 
-        save(uiLang, filterLangs) {
-            this.config.uiLang = uiLang;
-            this.config.filterLangs = filterLangs;
-            GM_setValue('ljsm_uiLang', uiLang);
-            GM_setValue('ljsm_filterLangs', JSON.stringify(filterLangs));
-            window.location.reload(); // Reload to apply changes immediately
+        save(config) {
+            GM_setValue('ljsm_auto_update_dict', config.autoUpdateDict);
+            GM_setValue('ljsm_uiLang', config.uiLang);
+            GM_setValue('ljsm_filterLangs', config.filterLangs);
+            window.location.reload();
         }
-
-        get uiLang() { return this.config.uiLang; }
-        get filterLangs() { return this.config.filterLangs; }
     }
 
     // --- I18N MANAGER ---
     class I18nManager {
-        constructor(config) {
+        constructor(config, cachedDict = null) {
             this.config = config;
             this.ui = DICTIONARIES[config.uiLang].ui;
             
@@ -173,25 +247,24 @@
             let negKeywords = [];
             let feedLabels = [];
 
-            // Combine keywords from all selected filtering languages
+            Object.values(DICTIONARIES).forEach(dict => {
+                feedLabels = feedLabels.concat(dict.ui.feed_post_labels);
+            });
+
             config.filterLangs.forEach(lang => {
-                if (DICTIONARIES[lang]) {
+                if (cachedDict && cachedDict[lang]) {
+                    posKeywords = posKeywords.concat(cachedDict[lang].positive);
+                    negKeywords = negKeywords.concat(cachedDict[lang].negative);
+                } else if (DICTIONARIES[lang]) {
                     posKeywords = posKeywords.concat(DICTIONARIES[lang].positive);
                     negKeywords = negKeywords.concat(DICTIONARIES[lang].negative);
                 }
             });
             
-            // Combine feed labels from all supported languages to always detect posts correctly regardless of filter settings
-            Object.values(DICTIONARIES).forEach(dict => {
-                feedLabels = feedLabels.concat(dict.ui.feed_post_labels);
-            });
-
-            // Deduplicate
             posKeywords = [...new Set(posKeywords)];
             negKeywords = [...new Set(negKeywords)];
             this.feedLabels = [...new Set(feedLabels)];
 
-            // Create Regexes
             this.posRegex = new RegExp(`(?:${posKeywords.join('|')})`, 'i');
             this.negRegex = new RegExp(`(?:${negKeywords.join('|')})`, 'i');
         }
@@ -217,7 +290,10 @@
             this.config = config;
             this.i18n = i18n;
             this.injectCSS();
-            GM_registerMenuCommand("⚙️ " + this.i18n.t('settings_title'), () => this.openSettingsModal());
+        }
+
+        initMenu(configObj) {
+            GM_registerMenuCommand("⚙️ " + this.i18n.t('settings_title'), () => this.openSettingsModal(configObj));
         }
 
         injectCSS() {
@@ -276,7 +352,7 @@
             `);
         }
 
-        openSettingsModal() {
+        openSettingsModal(config) {
             if (document.getElementById('livf-modal-overlay')) return;
 
             const applyStyles = (el, styles) => Object.assign(el.style, styles);
@@ -302,6 +378,36 @@
             title.textContent = this.i18n.t('settings_title');
             applyStyles(title, { margin: '0', fontSize: '20px', color: '#000000', fontWeight: 'bold' });
             modal.appendChild(title);
+            
+            // Auto Update Toggle
+            const updateGroup = document.createElement('div');
+            applyStyles(updateGroup, { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' });
+            
+            const updateLabel = document.createElement('label');
+            updateLabel.textContent = this.i18n.t('auto_update_dict');
+            updateLabel.style.fontWeight = 'bold';
+            updateLabel.style.cursor = 'pointer';
+            
+            const autoUpdateToggle = document.createElement('input');
+            autoUpdateToggle.type = 'checkbox';
+            autoUpdateToggle.checked = config.autoUpdateDict;
+            autoUpdateToggle.style.width = '18px';
+            autoUpdateToggle.style.height = '18px';
+            autoUpdateToggle.style.cursor = 'pointer';
+            
+            updateGroup.appendChild(updateLabel);
+            updateGroup.appendChild(autoUpdateToggle);
+            modal.appendChild(updateGroup);
+            
+            const syncStatusEl = document.createElement('div');
+            syncStatusEl.style.fontSize = '11px';
+            syncStatusEl.style.color = '#666';
+            syncStatusEl.style.marginTop = '-12px';
+            modal.appendChild(syncStatusEl);
+            
+            const hr = document.createElement('hr');
+            applyStyles(hr, { border: '0', borderTop: '1px solid #ccc', margin: '0' });
+            modal.appendChild(hr);
 
             // UI Language Dropdown
             const uiLangGroup = document.createElement('div');
@@ -318,7 +424,7 @@
                 const opt = document.createElement('option');
                 opt.value = code;
                 opt.textContent = dict.name;
-                if (this.config.uiLang === code) opt.selected = true;
+                if (config.uiLang === code) opt.selected = true;
                 uiLangSelect.appendChild(opt);
             });
             uiLangGroup.appendChild(uiLangSelect);
@@ -344,7 +450,7 @@
                 const cb = document.createElement('input');
                 cb.type = 'checkbox';
                 cb.value = code;
-                cb.checked = this.config.filterLangs.includes(code);
+                cb.checked = config.filterLangs.includes(code);
                 
                 label.appendChild(cb);
                 label.appendChild(document.createTextNode(dict.name));
@@ -381,8 +487,30 @@
                     return;
                 }
                 
-                this.config.save(uiLang, filterLangs);
+                config.autoUpdateDict = autoUpdateToggle.checked;
+                config.uiLang = uiLang;
+                config.filterLangs = filterLangs;
+                this.config.save(config);
             };
+            
+            const updateStatusText = () => {
+                const status = GM_getValue('ljsm_sync_status', 'ok');
+                const needsReload = GM_getValue('ljsm_sync_needs_reload', false);
+                let text = '';
+                if (!autoUpdateToggle.checked) {
+                    text = this.i18n.t('sync_status_disabled');
+                } else if (status === 'error') {
+                    text = this.i18n.t('sync_status_error');
+                } else {
+                    text = this.i18n.t('sync_status_ok');
+                    if (needsReload) {
+                        text += '<span style="color:#d11124; font-weight:bold;">' + this.i18n.t('reload_required') + '</span>';
+                    }
+                }
+                syncStatusEl.innerHTML = text;
+            };
+            updateStatusText();
+            autoUpdateToggle.addEventListener('change', updateStatusText);
 
             actions.appendChild(cancelBtn);
             actions.appendChild(saveBtn);
@@ -512,11 +640,15 @@
 
     // --- MAIN APP INIT ---
     log('TOP LEVEL SCRIPT EXECUTION STARTED');
-    const config = new ConfigManager();
-    const i18n = new I18nManager(config);
-    const ui = new UIManager(config, i18n);
-    const feed = new FeedObserver(i18n);
+    const configMgr = new ConfigManager();
     
-    feed.start();
+    syncDictionariesIfNeeded(configMgr.config, (cachedDict) => {
+        const i18n = new I18nManager(configMgr.config, cachedDict);
+        const ui = new UIManager(configMgr, i18n);
+        const feed = new FeedObserver(i18n);
+        
+        feed.start();
+        ui.initMenu(configMgr.config);
+    });
 
 })();

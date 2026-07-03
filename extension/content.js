@@ -6,29 +6,75 @@
         if (DEBUG_MODE) console.warn('[LJSM]', ...args);
     };
 
+    // --- DICTIONARY SYNC ---
+    const DICT_URL = 'https://raw.githubusercontent.com/i-s-rusakov/job-seeking-mode-for-linkedin/master/dictionaries.json';
+    const SYNC_INTERVAL = 3 * 60 * 60 * 1000; // 3 hours
+
+    function syncDictionariesIfNeeded(config, callback) {
+        if (!config.autoUpdateDict) {
+            chrome.storage.sync.set({ ljsm_sync_status: 'disabled' });
+            callback(null);
+            return;
+        }
+        
+        chrome.storage.local.get(['ljsm_dict_last_sync', 'ljsm_cached_dict'], (localItems) => {
+            const now = Date.now();
+            const lastSync = localItems.ljsm_dict_last_sync || 0;
+            
+            if (now - lastSync > SYNC_INTERVAL || !localItems.ljsm_cached_dict) {
+                log('Fetching latest dictionaries from GitHub...');
+                fetch(DICT_URL)
+                    .then(r => r.json())
+                    .then(data => {
+                        chrome.storage.local.set({
+                            ljsm_dict_last_sync: now,
+                            ljsm_cached_dict: data
+                        });
+                        chrome.storage.sync.set({ 
+                            ljsm_sync_status: 'ok',
+                            ljsm_sync_needs_reload: true 
+                        });
+                        log('Dictionaries updated successfully.');
+                        callback(data);
+                    })
+                    .catch(e => {
+                        console.error('[LJSM] Failed to sync dictionaries:', e);
+                        chrome.storage.sync.set({ ljsm_sync_status: 'error' });
+                        callback(localItems.ljsm_cached_dict || null);
+                    });
+            } else {
+                chrome.storage.sync.set({ ljsm_sync_status: 'ok', ljsm_sync_needs_reload: false });
+                callback(localItems.ljsm_cached_dict || null);
+            }
+        });
+    }
+
     // --- I18N MANAGER ---
     class I18nManager {
-        constructor(config) {
+        constructor(config, cachedDict = null) {
             this.config = config;
             this.ui = DICTIONARIES[config.uiLang].ui;
             
             let posKeywords = [];
             let negKeywords = [];
             let feedLabels = [];
-
-            config.filterLangs.forEach(lang => {
-                if (DICTIONARIES[lang]) {
-                    posKeywords = posKeywords.concat(DICTIONARIES[lang].positive);
-                    negKeywords = negKeywords.concat(DICTIONARIES[lang].negative);
-                }
-            });
             
             Object.values(DICTIONARIES).forEach(dict => {
                 feedLabels = feedLabels.concat(dict.ui.feed_post_labels);
             });
 
-            this.posRegex = new RegExp(`\\b(?:${posKeywords.join('|')})\\b`, 'i');
-            this.negRegex = new RegExp(`\\b(?:${negKeywords.join('|')})\\b`, 'i');
+            config.filterLangs.forEach(lang => {
+                if (cachedDict && cachedDict[lang]) {
+                    posKeywords = posKeywords.concat(cachedDict[lang].positive);
+                    negKeywords = negKeywords.concat(cachedDict[lang].negative);
+                } else if (DICTIONARIES[lang]) {
+                    posKeywords = posKeywords.concat(DICTIONARIES[lang].positive);
+                    negKeywords = negKeywords.concat(DICTIONARIES[lang].negative);
+                }
+            });
+
+            this.posRegex = new RegExp(`(?:${posKeywords.join('|')})`, 'i');
+            this.negRegex = new RegExp(`(?:${negKeywords.join('|')})`, 'i');
             this.feedLabels = [...new Set(feedLabels)].map(l => l.toLowerCase());
         }
 
@@ -165,18 +211,22 @@
 
         chrome.storage.sync.get({
             ljsm_enabled: true,
+            ljsm_auto_update_dict: true,
             ljsm_uiLang: defaultLang,
             ljsm_filterLangs: [defaultLang, 'en']
         }, (items) => {
             const config = {
                 enabled: items.ljsm_enabled,
+                autoUpdateDict: items.ljsm_auto_update_dict,
                 uiLang: items.ljsm_uiLang,
                 filterLangs: items.ljsm_filterLangs
             };
             
-            const i18n = new I18nManager(config);
-            const observer = new FeedObserver(i18n);
-            observer.start();
+            syncDictionariesIfNeeded(config, (cachedDict) => {
+                const i18n = new I18nManager(config, cachedDict);
+                const observer = new FeedObserver(i18n);
+                observer.start();
+            });
         });
     }
 

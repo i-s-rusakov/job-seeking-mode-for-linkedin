@@ -1,0 +1,26 @@
+{
+  "en": {
+    "positive": ["hiring", "vacancy", "vacancies", "job opening", "opening", "looking for a", "we are looking for", "join our team", "open role", "open position", "jobs recommended for you"],
+    "negative": ["looking for a job", "looking for work", "personal branding", "business opportunity", "open to work", "opentowork", "hire me", "#jobsearch", "#resumetips", "#hiringtrends"]
+  },
+  "ru": {
+    "positive": ["нанимаем", "вакансия", "вакансии", "открыта вакансия", "открытие", "ищем", "мы ищем", "присоединяйтесь к нашей команде", "присоединяйтесь к команде", "открыта роль", "открыта позиция", "открытую позицию", "найм", "в поиске", "рекомендуемые вакансии"],
+    "negative": ["ищу работу", "поиск работы", "поискработы", "персональный бренд", "бизнес возможность", "открыт к предложениям", "найми меня", "#поискработы", "#советыпорезюме", "#трендынайма"]
+  },
+  "es": {
+    "positive": ["contratando", "vacante", "vacantes", "oferta de trabajo", "apertura", "buscando un", "estamos buscando", "únete a nuestro equipo", "rol abierto", "puesto abierto", "empleos recomendados para ti"],
+    "negative": ["buscando trabajo", "buscando empleo", "marca personal", "oportunidad de negocio", "abierto a trabajar", "opentowork", "contrátame", "#busquedadeempleo", "#consejosdecurriculum", "#tendenciasdecontratacion"]
+  },
+  "de": {
+    "positive": ["einstellen", "vakanz", "stellenangebot", "wir suchen", "trete unserem team bei", "offene rolle", "offene position", "für dich empfohlene jobs"],
+    "negative": ["auf der suche nach einem job", "arbeitssuchend", "personal branding", "geschäftsmöglichkeit", "offen für arbeit", "opentowork", "stell mich ein", "#jobsuche", "#lebenslauftipps", "#einstellungstrends"]
+  },
+  "fr": {
+    "positive": ["embauche", "poste vacant", "postes vacants", "offre d'emploi", "ouverture", "à la recherche d'un", "nous recherchons", "rejoignez notre équipe", "rôle ouvert", "poste ouvert", "emplois recommandés pour vous"],
+    "negative": ["à la recherche d'un emploi", "cherche du travail", "marque personnelle", "opportunité d'affaires", "ouvert au travail", "opentowork", "embauchez-moi", "#rechercheemploi", "#conseilscv", "#tendancesembauche"]
+  },
+  "zh": {
+    "positive": ["招聘", "空缺", "职位空缺", "寻找", "我们正在寻找", "加入我们的团队", "开放职位", "为你推荐的工作"],
+    "negative": ["找工作", "个人品牌", "商业机会", "开放工作", "opentowork", "雇用我", "#求职", "#简历技巧", "#招聘趋势"]
+  }
+}
