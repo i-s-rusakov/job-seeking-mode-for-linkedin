@@ -16,7 +16,7 @@
 // @description:de Blenden Sie Nicht-Vakanz-Beiträge aus dem LinkedIn-Feed aus, mit mehrsprachiger Unterstützung
 // @description:fr Masquer les publications sans poste vacant du fil LinkedIn avec support multilingue
 // @description:zh 隐藏 LinkedIn 动态中非职位空缺的帖子，支持多语言
-// @author       You
+// @author       Ivan Rusakov
 // @match        *://*.linkedin.com/*
 // @icon         https://raw.githubusercontent.com/i-s-rusakov/job-seeking-mode-for-linkedin/master/extension/icons/icon48.png
 // @grant        GM_addStyle
