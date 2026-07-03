@@ -12,8 +12,20 @@ body {
     color: #333333;
     font-size: 14px;
 }
+.livf-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.livf-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
 #livf-modal h2 {
-    margin: 0 0 16px 0;
+    margin: 0;
     font-size: 18px;
     color: #000000;
     font-weight: bold;
