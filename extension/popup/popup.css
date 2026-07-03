@@ -1,0 +1,79 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f3f2ef;
+}
+#livf-modal {
+    background: #ffffff;
+    padding: 20px;
+    width: 320px;
+    box-sizing: border-box;
+    color: #333333;
+    font-size: 14px;
+}
+#livf-modal h2 {
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    color: #000000;
+    font-weight: bold;
+}
+.livf-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+.livf-form-group label {
+    font-weight: bold;
+}
+.livf-form-group select {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    background: #fff;
+    color: #000;
+    width: 100%;
+}
+.livf-checkbox-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+.livf-checkbox-group label {
+    font-weight: normal;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    margin: 0;
+}
+.livf-modal-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+}
+#save-status {
+    color: #057642;
+    font-size: 12px;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.livf-btn {
+    padding: 8px 16px;
+    border-radius: 24px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+}
+.livf-btn-primary {
+    background: #0a66c2;
+    color: #fff;
+}
+.livf-btn-primary:hover {
+    background: #004182;
+}

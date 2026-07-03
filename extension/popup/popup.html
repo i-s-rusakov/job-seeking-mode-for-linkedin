@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div id="livf-modal">
+        <h2 id="settings-title">Language Settings</h2>
+        <div class="livf-form-group">
+            <label id="ui-language-label">UI Language</label>
+            <select id="livf-ui-lang"></select>
+        </div>
+        <div class="livf-form-group">
+            <label id="filter-languages-label">Filtering Languages</label>
+            <div class="livf-checkbox-group" id="livf-filter-langs"></div>
+        </div>
+        <div class="livf-modal-actions">
+            <span id="save-status">Saved! Reload page.</span>
+            <button class="livf-btn livf-btn-primary" id="livf-save-btn">Save</button>
+        </div>
+    </div>
+    <script src="../shared.js"></script>
+    <script src="popup.js"></script>
+</body>
+</html>
