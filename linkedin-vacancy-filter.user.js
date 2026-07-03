@@ -256,28 +256,51 @@
                 }
                 /* Modal CSS */
                 #livf-modal-overlay {
-                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                    background: rgba(0,0,0,0.6); z-index: 999999;
-                    display: flex; justify-content: center; align-items: center;
+                    position: fixed !important; top: 0 !important; left: 0 !important; 
+                    width: 100% !important; height: 100% !important;
+                    background: rgba(0,0,0,0.6) !important; z-index: 999999 !important;
+                    display: flex !important; justify-content: center !important; align-items: center !important;
+                }
+                #livf-modal * {
+                    box-sizing: border-box !important;
+                    line-height: 1.5 !important;
                 }
                 #livf-modal {
-                    background: #fff; border-radius: 8px; padding: 24px;
-                    width: 400px; max-width: 90%; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                    font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, sans-serif;
+                    background: #fff !important; border-radius: 8px !important; padding: 24px !important;
+                    width: 400px !important; max-width: 90% !important; box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+                    font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, sans-serif !important;
+                    font-size: 14px !important;
+                    color: #333 !important;
+                    display: block !important;
+                    text-align: left !important;
                 }
-                #livf-modal h2 { margin-top: 0; margin-bottom: 16px; font-size: 20px; color: #000; }
-                .livf-form-group { margin-bottom: 16px; }
-                .livf-form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #333; }
-                .livf-form-group select { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px; }
-                .livf-checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-                .livf-checkbox-group label { font-weight: normal; display: flex; align-items: center; font-size: 14px; cursor: pointer; }
-                .livf-checkbox-group input { margin-right: 8px; cursor: pointer; }
-                .livf-modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
-                .livf-btn { padding: 8px 16px; border-radius: 24px; font-weight: 600; cursor: pointer; font-size: 14px; border: none; }
-                .livf-btn-secondary { background: transparent; color: #666; }
-                .livf-btn-secondary:hover { background: #f3f2ef; }
-                .livf-btn-primary { background: #0a66c2; color: #fff; }
-                .livf-btn-primary:hover { background: #004182; }
+                #livf-modal h2 { 
+                    margin: 0 0 16px 0 !important; font-size: 20px !important; color: #000 !important; 
+                    display: block !important; font-weight: 600 !important; 
+                }
+                .livf-form-group { margin: 0 0 16px 0 !important; display: block !important; }
+                .livf-form-group label { display: block !important; font-weight: 600 !important; margin: 0 0 8px 0 !important; color: #333 !important; }
+                .livf-form-group select { 
+                    width: 100% !important; padding: 8px !important; border-radius: 4px !important; 
+                    border: 1px solid #ccc !important; font-size: 14px !important; 
+                    background: #fff !important; color: #000 !important; display: block !important; 
+                }
+                .livf-checkbox-group { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+                .livf-checkbox-group label { 
+                    font-weight: normal !important; display: flex !important; align-items: center !important; 
+                    font-size: 14px !important; cursor: pointer !important; margin: 0 !important; 
+                }
+                .livf-checkbox-group input { margin: 0 8px 0 0 !important; cursor: pointer !important; width: auto !important; height: auto !important; display: inline-block !important; }
+                .livf-modal-actions { display: flex !important; justify-content: flex-end !important; gap: 12px !important; margin-top: 24px !important; }
+                .livf-btn { 
+                    padding: 8px 16px !important; border-radius: 24px !important; font-weight: 600 !important; 
+                    cursor: pointer !important; font-size: 14px !important; border: none !important; 
+                    display: inline-block !important; margin: 0 !important; 
+                }
+                .livf-btn-secondary { background: transparent !important; color: #666 !important; }
+                .livf-btn-secondary:hover { background: #f3f2ef !important; }
+                .livf-btn-primary { background: #0a66c2 !important; color: #fff !important; }
+                .livf-btn-primary:hover { background: #004182 !important; }
             `);
         }
 
