@@ -5,7 +5,10 @@
 // @name:de      Jobsuche-Modus für LinkedIn
 // @name:fr      Mode Recherche d'Emploi pour LinkedIn
 // @name:zh      LinkedIn的求职模式
-// @namespace    https://github.com/
+// @namespace    https://github.com/i-s-rusakov/job-seeking-mode-for-linkedin
+// @updateURL    https://raw.githubusercontent.com/i-s-rusakov/job-seeking-mode-for-linkedin/master/userscript/job-seeking-mode-for-linkedin.user.js
+// @downloadURL  https://raw.githubusercontent.com/i-s-rusakov/job-seeking-mode-for-linkedin/master/userscript/job-seeking-mode-for-linkedin.user.js
+// @supportURL   https://github.com/i-s-rusakov/job-seeking-mode-for-linkedin/issues
 // @version      1.0
 // @description  Hide non-vacancy posts from LinkedIn feed with multi-language support
 // @description:ru Скрывает посты без вакансий из ленты LinkedIn с поддержкой нескольких языков

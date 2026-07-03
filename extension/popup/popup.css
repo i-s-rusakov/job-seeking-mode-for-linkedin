@@ -89,3 +89,15 @@ body {
 .livf-btn-primary:hover {
     background: #004182;
 }
+.livf-footer {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 12px;
+}
+.livf-footer a {
+    color: #0a66c2;
+    text-decoration: none;
+}
+.livf-footer a:hover {
+    text-decoration: underline;
+}
