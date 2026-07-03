@@ -197,7 +197,7 @@
             this.config = config;
             this.i18n = i18n;
             this.injectCSS();
-            this.registerMenus();
+            GM_registerMenuCommand("⚙️ LIVF Settings", () => this.openSettingsModal());
         }
 
         injectCSS() {
@@ -256,38 +256,120 @@
             `);
         }
 
-        registerMenus() {
-            // 1. UI Language Cycler
-            const currentUIName = DICTIONARIES[this.config.uiLang].name;
-            GM_registerMenuCommand(`🌐 UI: ${currentUIName} (Click to change)`, () => {
-                const langs = Object.keys(DICTIONARIES);
-                const currentIndex = langs.indexOf(this.config.uiLang);
-                const nextIndex = (currentIndex + 1) % langs.length;
-                this.config.save(langs[nextIndex], this.config.filterLangs);
+        openSettingsModal() {
+            if (document.getElementById('livf-modal-overlay')) return;
+
+            const applyStyles = (el, styles) => Object.assign(el.style, styles);
+
+            const overlay = document.createElement('div');
+            overlay.id = 'livf-modal-overlay';
+            applyStyles(overlay, {
+                position: 'fixed', top: '0', left: '0', width: '100%', height: '100%',
+                backgroundColor: 'rgba(0,0,0,0.6)', zIndex: '2147483647',
+                display: 'flex', justifyContent: 'center', alignItems: 'center'
             });
 
-            // 2. Separator
-            GM_registerMenuCommand(`--- ${this.i18n.t('filter_languages')} ---`, () => {});
+            const modal = document.createElement('div');
+            applyStyles(modal, {
+                backgroundColor: '#ffffff', borderRadius: '8px', padding: '24px',
+                width: '400px', maxWidth: '90%', boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontSize: '14px', color: '#333333', display: 'flex', flexDirection: 'column', gap: '16px',
+                boxSizing: 'border-box'
+            });
 
-            // 3. Filtering Languages Toggles
+            const title = document.createElement('h2');
+            title.textContent = this.i18n.t('settings_title');
+            applyStyles(title, { margin: '0', fontSize: '20px', color: '#000000', fontWeight: 'bold' });
+            modal.appendChild(title);
+
+            // UI Language Dropdown
+            const uiLangGroup = document.createElement('div');
+            applyStyles(uiLangGroup, { display: 'flex', flexDirection: 'column', gap: '8px' });
+            
+            const uiLangLabel = document.createElement('label');
+            uiLangLabel.textContent = this.i18n.t('ui_language');
+            applyStyles(uiLangLabel, { fontWeight: 'bold' });
+            uiLangGroup.appendChild(uiLangLabel);
+
+            const uiLangSelect = document.createElement('select');
+            applyStyles(uiLangSelect, { padding: '8px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '14px', backgroundColor: '#fff', color: '#000' });
             Object.entries(DICTIONARIES).forEach(([code, dict]) => {
-                const isEnabled = this.config.filterLangs.includes(code);
-                const icon = isEnabled ? "✅" : "⬜";
-                
-                GM_registerMenuCommand(`${icon} ${dict.name}`, () => {
-                    let newLangs = [...this.config.filterLangs];
-                    if (isEnabled) {
-                        if (newLangs.length <= 1) {
-                            alert("You must have at least one filtering language enabled.");
-                            return;
-                        }
-                        newLangs = newLangs.filter(l => l !== code);
-                    } else {
-                        newLangs.push(code);
-                    }
-                    this.config.save(this.config.uiLang, newLangs);
-                });
+                const opt = document.createElement('option');
+                opt.value = code;
+                opt.textContent = dict.name;
+                if (this.config.uiLang === code) opt.selected = true;
+                uiLangSelect.appendChild(opt);
             });
+            uiLangGroup.appendChild(uiLangSelect);
+            modal.appendChild(uiLangGroup);
+
+            // Filtering Languages Checkboxes
+            const filterGroup = document.createElement('div');
+            applyStyles(filterGroup, { display: 'flex', flexDirection: 'column', gap: '8px' });
+            
+            const filterLabel = document.createElement('label');
+            filterLabel.textContent = this.i18n.t('filter_languages');
+            applyStyles(filterLabel, { fontWeight: 'bold' });
+            filterGroup.appendChild(filterLabel);
+
+            const checkboxContainer = document.createElement('div');
+            applyStyles(checkboxContainer, { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' });
+            
+            const checkboxes = [];
+            Object.entries(DICTIONARIES).forEach(([code, dict]) => {
+                const label = document.createElement('label');
+                applyStyles(label, { display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', margin: '0' });
+                
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.value = code;
+                cb.checked = this.config.filterLangs.includes(code);
+                
+                label.appendChild(cb);
+                label.appendChild(document.createTextNode(dict.name));
+                checkboxContainer.appendChild(label);
+                checkboxes.push(cb);
+            });
+            filterGroup.appendChild(checkboxContainer);
+            modal.appendChild(filterGroup);
+
+            // Actions
+            const actions = document.createElement('div');
+            applyStyles(actions, { display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '8px' });
+
+            const cancelBtn = document.createElement('button');
+            cancelBtn.textContent = this.i18n.t('cancel');
+            applyStyles(cancelBtn, { padding: '8px 16px', borderRadius: '24px', border: 'none', backgroundColor: 'transparent', color: '#666', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' });
+            
+            cancelBtn.onmouseover = () => cancelBtn.style.backgroundColor = '#f3f2ef';
+            cancelBtn.onmouseout = () => cancelBtn.style.backgroundColor = 'transparent';
+            cancelBtn.onclick = () => overlay.remove();
+            
+            const saveBtn = document.createElement('button');
+            saveBtn.textContent = this.i18n.t('save');
+            applyStyles(saveBtn, { padding: '8px 16px', borderRadius: '24px', border: 'none', backgroundColor: '#0a66c2', color: '#fff', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' });
+            
+            saveBtn.onmouseover = () => saveBtn.style.backgroundColor = '#004182';
+            saveBtn.onmouseout = () => saveBtn.style.backgroundColor = '#0a66c2';
+            saveBtn.onclick = () => {
+                const uiLang = uiLangSelect.value;
+                const filterLangs = checkboxes.filter(cb => cb.checked).map(cb => cb.value);
+                
+                if (filterLangs.length === 0) {
+                    alert("Please select at least one filtering language.");
+                    return;
+                }
+                
+                this.config.save(uiLang, filterLangs);
+            };
+
+            actions.appendChild(cancelBtn);
+            actions.appendChild(saveBtn);
+            modal.appendChild(actions);
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
         }
     }
 
