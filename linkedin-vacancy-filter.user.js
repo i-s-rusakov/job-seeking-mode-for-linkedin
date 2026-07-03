@@ -197,8 +197,7 @@
             this.config = config;
             this.i18n = i18n;
             this.injectCSS();
-            
-            GM_registerMenuCommand("⚙️ LIVF Settings", () => this.openSettingsModal());
+            this.registerMenus();
         }
 
         injectCSS() {
@@ -257,98 +256,38 @@
             `);
         }
 
-        openSettingsModal() {
-            if (document.getElementById('livf-modal-host')) return;
-
-            const host = document.createElement('div');
-            host.id = 'livf-modal-host';
-            host.style.cssText = 'position: fixed; z-index: 2147483647; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;';
-            document.body.appendChild(host);
-
-            const shadow = host.attachShadow({ mode: 'open' });
-            
-            const style = document.createElement('style');
-            style.textContent = `
-                :host { all: initial; }
-                * { box-sizing: border-box; font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, sans-serif; }
-                #livf-modal-overlay {
-                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                    background: rgba(0,0,0,0.6); z-index: 2147483647;
-                    display: flex; justify-content: center; align-items: center;
-                    pointer-events: auto;
-                }
-                #livf-modal {
-                    background: #fff; border-radius: 8px; padding: 24px;
-                    width: 400px; max-width: 90%; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                    color: #333; font-size: 14px; line-height: 1.5;
-                }
-                #livf-modal h2 { margin: 0 0 16px 0; font-size: 20px; color: #000; font-weight: 600; }
-                .livf-form-group { margin: 0 0 16px 0; }
-                .livf-form-group label { display: block; font-weight: 600; margin: 0 0 8px 0; color: #333; }
-                .livf-form-group select { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px; background: #fff; color: #000; outline: none; }
-                .livf-checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-                .livf-checkbox-group label { font-weight: normal; display: flex; align-items: center; font-size: 14px; cursor: pointer; margin: 0; }
-                .livf-checkbox-group input { margin: 0 8px 0 0; cursor: pointer; }
-                .livf-modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
-                .livf-btn { padding: 8px 16px; border-radius: 24px; font-weight: 600; cursor: pointer; font-size: 14px; border: none; }
-                .livf-btn-secondary { background: transparent; color: #666; }
-                .livf-btn-secondary:hover { background: #f3f2ef; }
-                .livf-btn-primary { background: #0a66c2; color: #fff; }
-                .livf-btn-primary:hover { background: #004182; }
-            `;
-            
-            const overlay = document.createElement('div');
-            overlay.id = 'livf-modal-overlay';
-            
-            let filterCheckboxesHtml = '';
-            Object.entries(DICTIONARIES).forEach(([code, dict]) => {
-                const isChecked = this.config.filterLangs.includes(code) ? 'checked' : '';
-                filterCheckboxesHtml += `<label><input type="checkbox" value="${code}" ${isChecked}> ${dict.name}</label>`;
+        registerMenus() {
+            // 1. UI Language Cycler
+            const currentUIName = DICTIONARIES[this.config.uiLang].name;
+            GM_registerMenuCommand(`🌐 UI: ${currentUIName} (Click to change)`, () => {
+                const langs = Object.keys(DICTIONARIES);
+                const currentIndex = langs.indexOf(this.config.uiLang);
+                const nextIndex = (currentIndex + 1) % langs.length;
+                this.config.save(langs[nextIndex], this.config.filterLangs);
             });
 
-            let uiSelectHtml = '';
+            // 2. Separator
+            GM_registerMenuCommand(`--- ${this.i18n.t('filter_languages')} ---`, () => {});
+
+            // 3. Filtering Languages Toggles
             Object.entries(DICTIONARIES).forEach(([code, dict]) => {
-                const isSelected = this.config.uiLang === code ? 'selected' : '';
-                uiSelectHtml += `<option value="${code}" ${isSelected}>${dict.name}</option>`;
+                const isEnabled = this.config.filterLangs.includes(code);
+                const icon = isEnabled ? "✅" : "⬜";
+                
+                GM_registerMenuCommand(`${icon} ${dict.name}`, () => {
+                    let newLangs = [...this.config.filterLangs];
+                    if (isEnabled) {
+                        if (newLangs.length <= 1) {
+                            alert("You must have at least one filtering language enabled.");
+                            return;
+                        }
+                        newLangs = newLangs.filter(l => l !== code);
+                    } else {
+                        newLangs.push(code);
+                    }
+                    this.config.save(this.config.uiLang, newLangs);
+                });
             });
-
-            overlay.innerHTML = `
-                <div id="livf-modal">
-                    <h2>${this.i18n.t('settings_title')}</h2>
-                    <div class="livf-form-group">
-                        <label>${this.i18n.t('ui_language')}</label>
-                        <select id="livf-ui-lang">${uiSelectHtml}</select>
-                    </div>
-                    <div class="livf-form-group">
-                        <label>${this.i18n.t('filter_languages')}</label>
-                        <div class="livf-checkbox-group" id="livf-filter-langs">
-                            ${filterCheckboxesHtml}
-                        </div>
-                    </div>
-                    <div class="livf-modal-actions">
-                        <button class="livf-btn livf-btn-secondary" id="livf-cancel-btn">${this.i18n.t('cancel')}</button>
-                        <button class="livf-btn livf-btn-primary" id="livf-save-btn">${this.i18n.t('save')}</button>
-                    </div>
-                </div>
-            `;
-            
-            shadow.appendChild(style);
-            shadow.appendChild(overlay);
-
-            shadow.getElementById('livf-cancel-btn').onclick = () => host.remove();
-            
-            shadow.getElementById('livf-save-btn').onclick = () => {
-                const uiLang = shadow.getElementById('livf-ui-lang').value;
-                const filterInputs = shadow.querySelectorAll('#livf-filter-langs input:checked');
-                const filterLangs = Array.from(filterInputs).map(i => i.value);
-                
-                if (filterLangs.length === 0) {
-                    alert("Please select at least one filtering language.");
-                    return;
-                }
-                
-                this.config.save(uiLang, filterLangs);
-            };
         }
     }
 
