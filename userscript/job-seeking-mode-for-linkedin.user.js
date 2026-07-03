@@ -388,6 +388,9 @@
             updateLabel.style.fontWeight = 'bold';
             updateLabel.style.cursor = 'pointer';
             
+            const controlsDiv = document.createElement('div');
+            applyStyles(controlsDiv, { display: 'flex', alignItems: 'center', gap: '8px' });
+            
             const autoUpdateToggle = document.createElement('input');
             autoUpdateToggle.type = 'checkbox';
             autoUpdateToggle.checked = config.autoUpdateDict;
@@ -395,8 +398,16 @@
             autoUpdateToggle.style.height = '18px';
             autoUpdateToggle.style.cursor = 'pointer';
             
+            const forceUpdateBtn = document.createElement('button');
+            forceUpdateBtn.textContent = '🔄';
+            applyStyles(forceUpdateBtn, { background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', padding: '0' });
+            forceUpdateBtn.title = 'Force Update';
+            
+            controlsDiv.appendChild(autoUpdateToggle);
+            controlsDiv.appendChild(forceUpdateBtn);
+            
             updateGroup.appendChild(updateLabel);
-            updateGroup.appendChild(autoUpdateToggle);
+            updateGroup.appendChild(controlsDiv);
             modal.appendChild(updateGroup);
             
             const syncStatusEl = document.createElement('div');
@@ -511,6 +522,16 @@
             };
             updateStatusText();
             autoUpdateToggle.addEventListener('change', updateStatusText);
+
+            forceUpdateBtn.onclick = () => {
+                if (!autoUpdateToggle.checked) return;
+                forceUpdateBtn.style.opacity = '0.5';
+                GM_setValue('ljsm_dict_last_sync', 0); // Force sync
+                syncDictionariesIfNeeded(this.config, () => {
+                    updateStatusText();
+                    forceUpdateBtn.style.opacity = '1';
+                });
+            };
 
             actions.appendChild(cancelBtn);
             actions.appendChild(saveBtn);

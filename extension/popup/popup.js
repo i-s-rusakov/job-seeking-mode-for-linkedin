@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveStatus = document.getElementById('save-status');
     const enableToggle = document.getElementById('livf-enable-toggle');
     const autoUpdateToggle = document.getElementById('livf-auto-update-toggle');
+    const forceUpdateBtn = document.getElementById('livf-force-update-btn');
     const syncStatusEl = document.getElementById('sync-status');
 
     const browserLang = (navigator.language || 'en').slice(0, 2).toLowerCase();
@@ -104,12 +105,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        chrome.storage.sync.set({
+        const settings = {
             ljsm_enabled: enableToggle.checked,
             ljsm_auto_update_dict: autoUpdateToggle.checked,
             ljsm_uiLang: uiLang,
             ljsm_filterLangs: filterLangs
-        }, () => {
+        };
+
+        chrome.storage.sync.set(settings, () => {
             saveStatus.style.opacity = 1;
             setTimeout(() => saveStatus.style.opacity = 0, 2000);
             
@@ -120,5 +123,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         });
+    });
+
+    forceUpdateBtn.addEventListener('click', () => {
+        if (!autoUpdateToggle.checked) return;
+        
+        forceUpdateBtn.style.opacity = '0.5';
+        const DICT_URL = 'https://raw.githubusercontent.com/i-s-rusakov/job-seeking-mode-for-linkedin/master/dictionaries.json';
+        
+        fetch(DICT_URL)
+            .then(r => r.json())
+            .then(data => {
+                chrome.storage.local.set({
+                    ljsm_dict_last_sync: Date.now(),
+                    ljsm_cached_dict: data
+                }, () => {
+                    chrome.storage.sync.set({ 
+                        ljsm_sync_status: 'ok',
+                        ljsm_sync_needs_reload: true 
+                    }, () => {
+                        forceUpdateBtn.style.opacity = '1';
+                        chrome.storage.sync.get(null, (newItems) => {
+                           renderUI(currentUiLang, filterLangsContainer.dataset.langs ? filterLangsContainer.dataset.langs.split(',') : [], newItems); 
+                        });
+                    });
+                });
+            })
+            .catch(e => {
+                chrome.storage.sync.set({ ljsm_sync_status: 'error' }, () => {
+                    forceUpdateBtn.style.opacity = '1';
+                    chrome.storage.sync.get(null, (newItems) => {
+                        renderUI(currentUiLang, filterLangsContainer.dataset.langs ? filterLangsContainer.dataset.langs.split(',') : [], newItems);
+                    });
+                });
+            });
     });
 });
