@@ -105,7 +105,7 @@
                 post_hidden: "Post hidden (click to expand)",
                 feed_post_labels: ["feed post", "post"]
             },
-            positive: ["hiring", "vacancy", "vacancies", "job opening", "opening", "looking for a", "we are looking for", "join our team", "open role", "open position", "jobs recommended for you"],
+            positive: ["hiring", "vacancy", "vacancies", "job opening", "opening", "looking for a", "we are looking for", "join our team", "open role", "open position", "jobs recommended for you", "opportunities", "job opportunities", "career opportunities"],
             negative: ["looking for a job", "looking for work", "personal branding", "business opportunity", "open to work", "opentowork", "hire me", "#jobsearch", "#resumetips", "#hiringtrends"]
         },
         ru: {
@@ -126,7 +126,7 @@
                 post_hidden: "Пост скрыт (кликните, чтобы развернуть)",
                 feed_post_labels: ["пост в ленте", "пост"]
             },
-            positive: ["нанимаем", "вакансия", "вакансии", "открыта вакансия", "открытие", "ищем", "мы ищем", "присоединяйтесь к нашей команде", "присоединяйтесь к команде", "открыта роль", "открыта позиция", "открытую позицию", "найм", "в поиске", "рекомендуемые вакансии"],
+            positive: ["нанимаем", "вакансия", "вакансии", "открыта вакансия", "открытие", "ищем", "мы ищем", "присоединяйтесь к нашей команде", "присоединяйтесь к команде", "открыта роль", "открыта позиция", "открытую позицию", "найм", "в поиске", "рекомендуемые вакансии", "возможности", "возможности трудоустройства", "карьерные возможности"],
             negative: ["ищу работу", "поиск работы", "поискработы", "персональный бренд", "бизнес возможность", "открыт к предложениям", "найми меня", "#поискработы", "#советыпорезюме", "#трендынайма"]
         },
         es: {
@@ -147,7 +147,7 @@
                 post_hidden: "Publicación oculta (clic para expandir)",
                 feed_post_labels: ["publicación en el feed", "publicación"]
             },
-            positive: ["contratando", "vacante", "vacantes", "oferta de empleo", "apertura", "buscando un", "estamos buscando", "únete a nuestro equipo", "unete a nuestro equipo", "rol abierto", "posición abierta", "empleos recomendados"],
+            positive: ["contratando", "vacante", "vacantes", "oferta de trabajo", "apertura", "buscando un", "estamos buscando", "únete a nuestro equipo", "rol abierto", "puesto abierto", "empleos recomendados para ti", "oportunidades", "oportunidades de empleo", "oportunidades de carrera"],
             negative: ["buscando trabajo", "buscando empleo", "marca personal", "oportunidad de negocio", "abierto a trabajar", "contrátame", "contratame"]
         },
         de: {
@@ -168,7 +168,7 @@
                 post_hidden: "Beitrag ausgeblendet (Klicken zum Erweitern)",
                 feed_post_labels: ["feed-beitrag", "beitrag"]
             },
-            positive: ["einstellen", "vakanz", "offene stelle", "stellenangebot", "wir suchen", "trete unserem team bei", "offene rolle", "offene position", "jobs für sie empfohlen"],
+            positive: ["einstellen", "vakanz", "stellenangebot", "wir suchen", "trete unserem team bei", "offene rolle", "offene position", "für dich empfohlene jobs", "möglichkeiten", "stellenangebote", "karrierechancen"],
             negative: ["suche arbeit", "suche job", "personal branding", "geschäftsmöglichkeit", "offen für arbeit", "stellensuche", "stelle mich ein"]
         },
         fr: {
@@ -189,7 +189,7 @@
                 post_hidden: "Message masqué (cliquez pour développer)",
                 feed_post_labels: ["post dans le fil", "post"]
             },
-            positive: ["embauche", "recrutement", "vacance", "poste vacant", "offre d'emploi", "nous cherchons", "rejoignez notre équipe", "rejoignez notre equipe", "rôle ouvert", "poste ouvert", "emplois recommandés"],
+            positive: ["embauche", "poste vacant", "postes vacants", "offre d'emploi", "ouverture", "à la recherche d'un", "nous recherchons", "rejoignez notre équipe", "rôle ouvert", "poste ouvert", "emplois recommandés pour vous", "opportunités", "opportunités d'emploi", "opportunités de carrière"],
             negative: ["cherche un emploi", "recherche de travail", "marque personnelle", "opportunité d'affaires", "ouvert au travail", "embauchez-moi"]
         },
         zh: {
@@ -210,7 +210,7 @@
                 post_hidden: "帖子已隐藏（点击展开）",
                 feed_post_labels: ["动态帖子", "帖子"]
             },
-            positive: ["招聘", "职位空缺", "空缺", "寻找", "我们正在寻找", "加入我们的团队", "开放职位", "为您推荐的职位"],
+            positive: ["招聘", "空缺", "职位空缺", "寻找", "我们正在寻找", "加入我们的团队", "开放职位", "为你推荐的工作", "机会", "就业机会", "职业机会"],
             negative: ["找工作", "求职", "个人品牌", "商业机会", "寻找工作", "聘用我"]
         }
     };
