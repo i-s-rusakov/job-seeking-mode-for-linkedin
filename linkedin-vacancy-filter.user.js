@@ -1,8 +1,18 @@
 // ==UserScript==
 // @name         LinkedIn Vacancy Filter
-// @namespace    http://tampermonkey.net/
-// @version      0.2
+// @name:ru      LinkedIn Фильтр Вакансий
+// @name:es      LinkedIn Filtro de Vacantes
+// @name:de      LinkedIn Stellenangebote Filter
+// @name:fr      LinkedIn Filtre de Postes Vacants
+// @name:zh      LinkedIn 职位空缺过滤器
+// @namespace    https://github.com/
+// @version      1.0
 // @description  Hide non-vacancy posts from LinkedIn feed with multi-language support
+// @description:ru Скрывает посты без вакансий из ленты LinkedIn с поддержкой нескольких языков
+// @description:es Ocultar publicaciones que no sean vacantes del feed de LinkedIn con soporte multilingüe
+// @description:de Blenden Sie Nicht-Vakanz-Beiträge aus dem LinkedIn-Feed aus, mit mehrsprachiger Unterstützung
+// @description:fr Masquer les publications sans poste vacant du fil LinkedIn avec support multilingue
+// @description:zh 隐藏 LinkedIn 动态中非职位空缺的帖子，支持多语言
 // @author       You
 // @match        *://*.linkedin.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=linkedin.com
@@ -11,12 +21,13 @@
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_registerMenuCommand
+// @license      MIT
 // ==/UserScript==
 
 (function() {
     'use strict';
     
-    const DEBUG_MODE = true;
+    const DEBUG_MODE = false;
     const log = (...args) => {
         if (DEBUG_MODE) console.warn('[LIVF]', ...args);
     };
