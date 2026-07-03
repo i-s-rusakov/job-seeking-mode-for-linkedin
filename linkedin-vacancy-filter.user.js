@@ -37,7 +37,7 @@
         en: {
             name: "English",
             ui: {
-                settings_title: "LIVF Settings",
+                settings_title: "Language Settings",
                 ui_language: "UI Language",
                 filter_languages: "Filtering Languages",
                 save: "Save",
@@ -52,7 +52,7 @@
         ru: {
             name: "Русский",
             ui: {
-                settings_title: "Настройки LIVF",
+                settings_title: "Настройки Языков",
                 ui_language: "Язык интерфейса",
                 filter_languages: "Языки фильтрации",
                 save: "Сохранить",
@@ -67,7 +67,7 @@
         es: {
             name: "Español",
             ui: {
-                settings_title: "Configuración LIVF",
+                settings_title: "Configuración de Idiomas",
                 ui_language: "Idioma de UI",
                 filter_languages: "Idiomas de filtrado",
                 save: "Guardar",
@@ -82,7 +82,7 @@
         de: {
             name: "Deutsch",
             ui: {
-                settings_title: "LIVF Einstellungen",
+                settings_title: "Spracheinstellungen",
                 ui_language: "UI-Sprache",
                 filter_languages: "Filtersprachen",
                 save: "Speichern",
@@ -97,7 +97,7 @@
         fr: {
             name: "Français",
             ui: {
-                settings_title: "Paramètres LIVF",
+                settings_title: "Paramètres de Langue",
                 ui_language: "Langue de l'interface",
                 filter_languages: "Langues de filtrage",
                 save: "Enregistrer",
@@ -112,7 +112,7 @@
         zh: {
             name: "中文",
             ui: {
-                settings_title: "LIVF 设置",
+                settings_title: "语言设置",
                 ui_language: "界面语言",
                 filter_languages: "过滤语言",
                 save: "保存",
@@ -208,7 +208,7 @@
             this.config = config;
             this.i18n = i18n;
             this.injectCSS();
-            GM_registerMenuCommand("⚙️ LIVF Settings", () => this.openSettingsModal());
+            GM_registerMenuCommand("⚙️ " + this.i18n.t('settings_title'), () => this.openSettingsModal());
         }
 
         injectCSS() {
