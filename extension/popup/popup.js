@@ -100,11 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const uiLang = uiLangSelect.value;
         const filterLangs = Array.from(filterLangsContainer.querySelectorAll('input:checked')).map(cb => cb.value);
 
-        if (filterLangs.length === 0) {
-            alert("Please select at least one filtering language.");
-            return;
-        }
-
         const settings = {
             ljsm_enabled: enableToggle.checked,
             ljsm_auto_update_dict: autoUpdateToggle.checked,
@@ -144,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, () => {
                         forceUpdateBtn.style.opacity = '1';
                         chrome.storage.sync.get(null, (newItems) => {
-                           renderUI(currentUiLang, filterLangsContainer.dataset.langs ? filterLangsContainer.dataset.langs.split(',') : [], newItems); 
+                           renderUI(currentUiLang, Array.from(filterLangsContainer.querySelectorAll('input:checked')).map(cb => cb.value), newItems); 
                         });
                     });
                 });
@@ -153,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 chrome.storage.sync.set({ ljsm_sync_status: 'error' }, () => {
                     forceUpdateBtn.style.opacity = '1';
                     chrome.storage.sync.get(null, (newItems) => {
-                        renderUI(currentUiLang, filterLangsContainer.dataset.langs ? filterLangsContainer.dataset.langs.split(',') : [], newItems);
+                        renderUI(currentUiLang, Array.from(filterLangsContainer.querySelectorAll('input:checked')).map(cb => cb.value), newItems);
                     });
                 });
             });

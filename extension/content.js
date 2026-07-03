@@ -215,6 +215,7 @@
             ljsm_uiLang: defaultLang,
             ljsm_filterLangs: [defaultLang, 'en']
         }, (items) => {
+            if (!items.ljsm_enabled || !items.ljsm_filterLangs || items.ljsm_filterLangs.length === 0) return;
             const config = {
                 enabled: items.ljsm_enabled,
                 autoUpdateDict: items.ljsm_auto_update_dict,

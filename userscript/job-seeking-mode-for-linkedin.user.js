@@ -493,11 +493,6 @@
                 const uiLang = uiLangSelect.value;
                 const filterLangs = checkboxes.filter(cb => cb.checked).map(cb => cb.value);
                 
-                if (filterLangs.length === 0) {
-                    alert("Please select at least one filtering language.");
-                    return;
-                }
-                
                 config.autoUpdateDict = autoUpdateToggle.checked;
                 config.uiLang = uiLang;
                 config.filterLangs = filterLangs;
@@ -666,9 +661,11 @@
     syncDictionariesIfNeeded(configMgr.config, (cachedDict) => {
         const i18n = new I18nManager(configMgr.config, cachedDict);
         const ui = new UIManager(configMgr, i18n);
-        const feed = new FeedObserver(i18n);
         
-        feed.start();
+        if (configMgr.config.filterLangs && configMgr.config.filterLangs.length > 0) {
+            const feed = new FeedObserver(i18n);
+            feed.start();
+        }
         ui.initMenu(configMgr.config);
     });
 
