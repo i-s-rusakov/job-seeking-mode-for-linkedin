@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterLangsContainer = document.getElementById('livf-filter-langs');
     const saveBtn = document.getElementById('livf-save-btn');
     const saveStatus = document.getElementById('save-status');
+    const enableToggle = document.getElementById('livf-enable-toggle');
 
     const browserLang = (navigator.language || 'en').slice(0, 2).toLowerCase();
     const supportedLangs = Object.keys(DICTIONARIES);
@@ -12,9 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load settings from Chrome Sync Storage
     chrome.storage.sync.get({
+        ljsm_enabled: true,
         ljsm_uiLang: defaultLang,
         ljsm_filterLangs: [defaultLang, 'en']
     }, (items) => {
+        enableToggle.checked = items.ljsm_enabled;
         currentUiLang = items.ljsm_uiLang;
         const filterLangs = [...new Set(items.ljsm_filterLangs)];
         
@@ -27,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Apply translations
         document.getElementById('settings-title').textContent = uiDict.settings_title;
+        document.getElementById('enable-filtering-label').textContent = uiDict.enable_filtering;
         document.getElementById('ui-language-label').textContent = uiDict.ui_language;
         document.getElementById('filter-languages-label').textContent = uiDict.filter_languages;
         saveBtn.textContent = uiDict.save;
@@ -71,6 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         chrome.storage.sync.set({
+            ljsm_enabled: enableToggle.checked,
             ljsm_uiLang: uiLang,
             ljsm_filterLangs: filterLangs
         }, () => {

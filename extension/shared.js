@@ -3,6 +3,7 @@ const DICTIONARIES = {
         name: "English",
         ui: {
             settings_title: "Language Settings",
+            enable_filtering: "Enable Job Seeking Mode",
             ui_language: "UI Language",
             filter_languages: "Filtering Languages",
             save: "Save",
@@ -18,6 +19,7 @@ const DICTIONARIES = {
         name: "Русский",
         ui: {
             settings_title: "Настройки Языков",
+            enable_filtering: "Включить Режим Поиска Работы",
             ui_language: "Язык интерфейса",
             filter_languages: "Языки фильтрации",
             save: "Сохранить",
@@ -33,6 +35,7 @@ const DICTIONARIES = {
         name: "Español",
         ui: {
             settings_title: "Configuración de Idiomas",
+            enable_filtering: "Habilitar Modo Búsqueda de Empleo",
             ui_language: "Idioma de UI",
             filter_languages: "Idiomas de filtrado",
             save: "Guardar",
@@ -48,6 +51,7 @@ const DICTIONARIES = {
         name: "Deutsch",
         ui: {
             settings_title: "Spracheinstellungen",
+            enable_filtering: "Jobsuche-Modus Aktivieren",
             ui_language: "UI-Sprache",
             filter_languages: "Filtersprachen",
             save: "Speichern",
@@ -63,6 +67,7 @@ const DICTIONARIES = {
         name: "Français",
         ui: {
             settings_title: "Paramètres de Langue",
+            enable_filtering: "Activer le Mode Recherche d'Emploi",
             ui_language: "Langue de l'interface",
             filter_languages: "Langues de filtrage",
             save: "Enregistrer",
@@ -78,6 +83,7 @@ const DICTIONARIES = {
         name: "中文",
         ui: {
             settings_title: "语言设置",
+            enable_filtering: "启用求职模式",
             ui_language: "界面语言",
             filter_languages: "过滤语言",
             save: "保存",

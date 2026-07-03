@@ -41,6 +41,7 @@
             name: "English",
             ui: {
                 settings_title: "Language Settings",
+                enable_filtering: "Enable Job Seeking Mode",
                 ui_language: "UI Language",
                 filter_languages: "Filtering Languages",
                 save: "Save",
@@ -56,6 +57,7 @@
             name: "Русский",
             ui: {
                 settings_title: "Настройки Языков",
+                enable_filtering: "Включить Режим Поиска Работы",
                 ui_language: "Язык интерфейса",
                 filter_languages: "Языки фильтрации",
                 save: "Сохранить",
@@ -71,6 +73,7 @@
             name: "Español",
             ui: {
                 settings_title: "Configuración de Idiomas",
+                enable_filtering: "Habilitar Modo Búsqueda de Empleo",
                 ui_language: "Idioma de UI",
                 filter_languages: "Idiomas de filtrado",
                 save: "Guardar",
@@ -86,6 +89,7 @@
             name: "Deutsch",
             ui: {
                 settings_title: "Spracheinstellungen",
+                enable_filtering: "Jobsuche-Modus Aktivieren",
                 ui_language: "UI-Sprache",
                 filter_languages: "Filtersprachen",
                 save: "Speichern",
@@ -101,6 +105,7 @@
             name: "Français",
             ui: {
                 settings_title: "Paramètres de Langue",
+                enable_filtering: "Activer le Mode Recherche d'Emploi",
                 ui_language: "Langue de l'interface",
                 filter_languages: "Langues de filtrage",
                 save: "Enregistrer",
@@ -116,6 +121,7 @@
             name: "中文",
             ui: {
                 settings_title: "语言设置",
+                enable_filtering: "启用求职模式",
                 ui_language: "界面语言",
                 filter_languages: "过滤语言",
                 save: "保存",
@@ -468,6 +474,9 @@
 
         start() {
             const observer = new MutationObserver((mutations) => {
+                const path = window.location.pathname;
+                if (path !== '/' && !path.startsWith('/feed')) return;
+
                 let shouldProcess = false;
                 for (const mutation of mutations) {
                     if (mutation.addedNodes.length > 0) {
@@ -487,7 +496,10 @@
                 if (feedContainer) {
                     log('Starting observer on feed container');
                     observer.observe(feedContainer, { childList: true, subtree: true });
-                    this.processFeed();
+                    const path = window.location.pathname;
+                    if (path === '/' || path.startsWith('/feed')) {
+                        this.processFeed();
+                    }
                 } else {
                     log('Feed container not found, retrying in 1s...');
                     setTimeout(init, 1000);

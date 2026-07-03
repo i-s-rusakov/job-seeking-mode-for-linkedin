@@ -126,6 +126,10 @@
 
         start() {
             const observer = new MutationObserver((mutations) => {
+                const path = window.location.pathname;
+                if (path !== '/' && !path.startsWith('/feed')) return;
+                if (!this.i18n.config.enabled) return;
+
                 let shouldProcess = false;
                 for (const mutation of mutations) {
                     if (mutation.addedNodes.length > 0) {
@@ -145,7 +149,10 @@
             observer.observe(feedContainer, { childList: true, subtree: true });
             
             // Initial run
-            this.processFeed();
+            const path = window.location.pathname;
+            if ((path === '/' || path.startsWith('/feed')) && this.i18n.config.enabled) {
+                this.processFeed();
+            }
             log('Starting observer on feed container');
         }
     }
@@ -157,10 +164,12 @@
         const defaultLang = supportedLangs.includes(browserLang) ? browserLang : 'en';
 
         chrome.storage.sync.get({
+            ljsm_enabled: true,
             ljsm_uiLang: defaultLang,
             ljsm_filterLangs: [defaultLang, 'en']
         }, (items) => {
             const config = {
+                enabled: items.ljsm_enabled,
                 uiLang: items.ljsm_uiLang,
                 filterLangs: items.ljsm_filterLangs
             };
