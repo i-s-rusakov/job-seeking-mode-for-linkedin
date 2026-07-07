@@ -1,4 +1,3 @@
 # Ignore all .log files and log/ directory
 *.log
 log/
-docs/

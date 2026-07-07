@@ -2,6 +2,10 @@
 
 A powerful browser extension and userscript that declutters your LinkedIn feed by hiding all posts except those advertising open vacancies. Keep your feed clean and focused purely on job opportunities from your connections and followed companies.
 
+| Filtered Feed | Post States |
+| :---: | :---: |
+| ![Filtered Feed](docs/screenshots/feed_filtered.png)<br>*Filtered Feed* | ![Collapsed Post](docs/screenshots/message_coollapsed.png)<br>*Collapsed Post*<br><br>![Expanded Post](docs/screenshots/message_expanded.png)<br>*Expanded Post*<br><br>![Unfiltered Post](docs/screenshots/message_unfiltered.png)<br>*Unfiltered Post* |
+
 ## Features
 
 - **Vacancy Filtering:** Automatically detects and shows posts containing job opportunity keywords while hiding everything else.
@@ -36,6 +40,10 @@ You can use Job Seeking Mode either as a standalone Chrome Extension or as a Use
 ## How it Works
 
 The script operates entirely locally in your browser. It does not send any data to external servers. When you scroll through LinkedIn, it checks the text of each new post against a carefully curated dictionary of vacancy-related keywords (e.g., "hiring", "looking for", "вакансия", "ищем"). If a match is found, the post remains visible. If no match is found, the post is visually collapsed (with a button to expand it if you wish to read it anyway).
+
+| Extension Settings | Userscript Settings |
+| :---: | :---: |
+| ![Extension UI](docs/screenshots/extension_ui.png)<br>*Chrome Extension UI* | ![Script Options Menu](docs/screenshots/script_options.png)<br>*Tampermonkey Menu*<br><br>![Script Options Modal](docs/screenshots/script_options_modal.png)<br>*Settings Modal* |
 
 ## License
 
