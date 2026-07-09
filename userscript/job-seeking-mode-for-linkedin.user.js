@@ -595,6 +595,10 @@
         }
 
         processPost(postNode) {
+            if (this.i18n.config.highlightKeywords) {
+                this.highlightTextNodes(postNode);
+            }
+
             if (this.processedPosts.has(postNode)) return;
             this.processedPosts.add(postNode);
 
@@ -636,10 +640,6 @@
                 postNode.classList.add('livf-collapsed');
                 postNode.style.border = 'none';
             }
-
-            if (this.i18n.config.highlightKeywords) {
-                this.highlightTextNodes(postNode);
-            }
         }
 
         createHighlightedNodes(text) {
@@ -649,20 +649,26 @@
                 if (!regex) return;
                 for (let i = 0; i < result.length; i++) {
                     const node = result[i];
-                    if (node.nodeType === Node.TEXT_NODE) {
+                    if (node.nodeType === 3) {
                         const str = node.nodeValue;
+                        if (!str.trim()) continue;
                         const matches = [...str.matchAll(regex)];
                         if (matches.length > 0) {
                             const newNodes = [];
                             let lastIndex = 0;
                             for (const match of matches) {
+                                if (!match[0]) continue;
                                 const matchIndex = match.index;
                                 if (matchIndex > lastIndex) {
                                     newNodes.push(document.createTextNode(str.substring(lastIndex, matchIndex)));
                                 }
                                 const span = document.createElement('span');
                                 span.className = 'livf-highlight';
-                                Object.assign(span.style, style);
+                                if (style.color) span.style.setProperty('color', style.color, 'important');
+                                if (style.fontWeight) span.style.setProperty('font-weight', style.fontWeight, 'important');
+                                if (style.fontStyle) span.style.setProperty('font-style', style.fontStyle, 'important');
+                                span.style.setProperty('text-decoration', 'underline', 'important');
+                                span.style.setProperty('background-color', 'transparent', 'important');
                                 span.textContent = match[0];
                                 newNodes.push(span);
                                 lastIndex = matchIndex + match[0].length;
@@ -685,14 +691,14 @@
         }
 
         highlightTextNodes(postNode) {
-            const walker = document.createTreeWalker(postNode, NodeFilter.SHOW_TEXT, {
+            const walker = document.createTreeWalker(postNode, 4, {
                 acceptNode: (node) => {
                     const parent = node.parentNode;
-                    if (!parent) return NodeFilter.FILTER_REJECT;
+                    if (!parent) return 2;
                     const tag = parent.tagName;
-                    if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT') return NodeFilter.FILTER_REJECT;
-                    if (parent.classList && parent.classList.contains('livf-highlight')) return NodeFilter.FILTER_REJECT;
-                    return NodeFilter.FILTER_ACCEPT;
+                    if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT') return 2;
+                    if (parent.classList && (parent.classList.contains('livf-highlight') || parent.classList.contains('ljsm-highlight') || parent.classList.contains('livf-collapse-btn'))) return 2;
+                    return 1;
                 }
             });
 
@@ -705,12 +711,15 @@
             }
 
             textNodes.forEach(textNode => {
-                const newNodes = this.createHighlightedNodes(textNode.nodeValue);
-                if (newNodes.length > 1) { 
-                    const fragment = document.createDocumentFragment();
-                    newNodes.forEach(n => fragment.appendChild(n));
-                    textNode.parentNode.replaceChild(fragment, textNode);
-                }
+                try {
+                    const newNodes = this.createHighlightedNodes(textNode.nodeValue);
+                    const hasHighlight = newNodes.some(n => n.nodeType === 1);
+                    if (hasHighlight) { 
+                        const fragment = document.createDocumentFragment();
+                        newNodes.forEach(n => fragment.appendChild(n));
+                        textNode.parentNode.replaceChild(fragment, textNode);
+                    }
+                } catch (e) {}
             });
         }
 
