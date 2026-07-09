@@ -80,6 +80,11 @@
             this.strongPosRegex = strongPosKeywords.length > 0 ? new RegExp(`(?:${strongPosKeywords.join('|')})`, 'i') : null;
             this.posRegex = new RegExp(`(?:${posKeywords.join('|')})`, 'i');
             this.negRegex = new RegExp(`(?:${negKeywords.join('|')})`, 'i');
+            
+            this.strongPosRegexG = strongPosKeywords.length > 0 ? new RegExp(`(${strongPosKeywords.join('|')})`, 'ig') : null;
+            this.posRegexG = new RegExp(`(${posKeywords.join('|')})`, 'ig');
+            this.negRegexG = new RegExp(`(${negKeywords.join('|')})`, 'ig');
+            
             this.feedLabels = [...new Set(feedLabels)].map(l => l.toLowerCase());
         }
 
@@ -147,6 +152,82 @@
             } else {
                 postNode.classList.add('ljsm-collapsed');
             }
+
+            if (this.i18n.config.highlightKeywords) {
+                this.highlightTextNodes(postNode);
+            }
+        }
+
+        createHighlightedNodes(text) {
+            let result = [document.createTextNode(text)];
+            
+            const applyRegex = (regex, style) => {
+                if (!regex) return;
+                for (let i = 0; i < result.length; i++) {
+                    const node = result[i];
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        const str = node.nodeValue;
+                        const matches = [...str.matchAll(regex)];
+                        if (matches.length > 0) {
+                            const newNodes = [];
+                            let lastIndex = 0;
+                            for (const match of matches) {
+                                const matchIndex = match.index;
+                                if (matchIndex > lastIndex) {
+                                    newNodes.push(document.createTextNode(str.substring(lastIndex, matchIndex)));
+                                }
+                                const span = document.createElement('span');
+                                span.className = 'ljsm-highlight';
+                                Object.assign(span.style, style);
+                                span.textContent = match[0];
+                                newNodes.push(span);
+                                lastIndex = matchIndex + match[0].length;
+                            }
+                            if (lastIndex < str.length) {
+                                newNodes.push(document.createTextNode(str.substring(lastIndex)));
+                            }
+                            result.splice(i, 1, ...newNodes);
+                            i += newNodes.length - 1;
+                        }
+                    }
+                }
+            };
+
+            applyRegex(this.i18n.strongPosRegexG, { color: '#057642', fontWeight: 'bold', fontStyle: 'italic' });
+            applyRegex(this.i18n.posRegexG, { color: '#057642', fontStyle: 'italic' });
+            applyRegex(this.i18n.negRegexG, { color: '#cc0000', fontStyle: 'italic' });
+
+            return result;
+        }
+
+        highlightTextNodes(postNode) {
+            const walker = document.createTreeWalker(postNode, NodeFilter.SHOW_TEXT, {
+                acceptNode: (node) => {
+                    const parent = node.parentNode;
+                    if (!parent) return NodeFilter.FILTER_REJECT;
+                    const tag = parent.tagName;
+                    if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT') return NodeFilter.FILTER_REJECT;
+                    if (parent.classList && parent.classList.contains('ljsm-highlight')) return NodeFilter.FILTER_REJECT;
+                    return NodeFilter.FILTER_ACCEPT;
+                }
+            });
+
+            const textNodes = [];
+            let node;
+            while ((node = walker.nextNode())) {
+                if (node.nodeValue.trim()) {
+                    textNodes.push(node);
+                }
+            }
+
+            textNodes.forEach(textNode => {
+                const newNodes = this.createHighlightedNodes(textNode.nodeValue);
+                if (newNodes.length > 1) { 
+                    const fragment = document.createDocumentFragment();
+                    newNodes.forEach(n => fragment.appendChild(n));
+                    textNode.parentNode.replaceChild(fragment, textNode);
+                }
+            });
         }
 
         processFeed() {
@@ -217,6 +298,7 @@
 
         chrome.storage.sync.get({
             ljsm_enabled: true,
+            ljsm_highlight_keywords: false,
             ljsm_auto_update_dict: true,
             ljsm_uiLang: defaultLang,
             ljsm_filterLangs: [defaultLang, 'en']
@@ -224,6 +306,7 @@
             if (!items.ljsm_enabled || !items.ljsm_filterLangs || items.ljsm_filterLangs.length === 0) return;
             const config = {
                 enabled: items.ljsm_enabled,
+                highlightKeywords: items.ljsm_highlight_keywords,
                 autoUpdateDict: items.ljsm_auto_update_dict,
                 uiLang: items.ljsm_uiLang,
                 filterLangs: items.ljsm_filterLangs

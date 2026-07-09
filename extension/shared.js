@@ -4,6 +4,7 @@ const DICTIONARIES = {
         ui: {
             settings_title: "Language Settings",
             enable_filtering: "Enable Job Seeking Mode",
+            enable_highlighting: "Highlight keywords",
             auto_update_dict: "Auto-update keywords from GitHub",
             sync_status_ok: "Sync Status: Updated",
             sync_status_error: "Sync Status: Error",
@@ -26,6 +27,7 @@ const DICTIONARIES = {
         ui: {
             settings_title: "Настройки Языков",
             enable_filtering: "Включить Режим Поиска Работы",
+            enable_highlighting: "Подсвечивать ключевые слова",
             auto_update_dict: "Автообновление словарей с GitHub",
             sync_status_ok: "Синхронизация: Обновлено",
             sync_status_error: "Синхронизация: Ошибка",
@@ -48,6 +50,7 @@ const DICTIONARIES = {
         ui: {
             settings_title: "Configuración de Idiomas",
             enable_filtering: "Habilitar Modo Búsqueda de Empleo",
+            enable_highlighting: "Resaltar palabras clave",
             auto_update_dict: "Actualización automática de GitHub",
             sync_status_ok: "Sincronización: Actualizado",
             sync_status_error: "Sincronización: Error",
@@ -70,6 +73,7 @@ const DICTIONARIES = {
         ui: {
             settings_title: "Spracheinstellungen",
             enable_filtering: "Jobsuche-Modus Aktivieren",
+            enable_highlighting: "Schlüsselwörter hervorheben",
             auto_update_dict: "Auto-Update-Wörterbuch von GitHub",
             sync_status_ok: "Sync-Status: Aktualisiert",
             sync_status_error: "Sync-Status: Fehler",
@@ -92,6 +96,7 @@ const DICTIONARIES = {
         ui: {
             settings_title: "Paramètres de Langue",
             enable_filtering: "Activer le Mode Recherche d'Emploi",
+            enable_highlighting: "Mettre en évidence les mots-clés",
             auto_update_dict: "Mise à jour auto des mots-clés (GitHub)",
             sync_status_ok: "Statut: Mis à jour",
             sync_status_error: "Statut: Erreur",
@@ -114,6 +119,7 @@ const DICTIONARIES = {
         ui: {
             settings_title: "语言设置",
             enable_filtering: "启用求职模式",
+            enable_highlighting: "突出显示关键词",
             auto_update_dict: "从GitHub自动更新关键词",
             sync_status_ok: "同步状态: 已更新",
             sync_status_error: "同步状态: 错误",

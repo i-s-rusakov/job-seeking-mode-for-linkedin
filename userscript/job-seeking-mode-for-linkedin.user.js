@@ -92,6 +92,7 @@
             ui: {
                 settings_title: "Language Settings",
                 enable_filtering: "Enable Job Seeking Mode",
+                enable_highlighting: "Highlight keywords",
                 auto_update_dict: "Auto-update keywords from GitHub",
                 sync_status_ok: "Sync Status: Updated",
                 sync_status_error: "Sync Status: Error",
@@ -114,6 +115,7 @@
             ui: {
                 settings_title: "Настройки Языков",
                 enable_filtering: "Включить Режим Поиска Работы",
+                enable_highlighting: "Подсвечивать ключевые слова",
                 auto_update_dict: "Автообновление словарей с GitHub",
                 sync_status_ok: "Синхронизация: Обновлено",
                 sync_status_error: "Синхронизация: Ошибка",
@@ -136,6 +138,7 @@
             ui: {
                 settings_title: "Configuración de Idiomas",
                 enable_filtering: "Habilitar Modo Búsqueda de Empleo",
+                enable_highlighting: "Resaltar palabras clave",
                 auto_update_dict: "Actualización automática de GitHub",
                 sync_status_ok: "Sincronización: Actualizado",
                 sync_status_error: "Sincronización: Error",
@@ -158,6 +161,7 @@
             ui: {
                 settings_title: "Spracheinstellungen",
                 enable_filtering: "Jobsuche-Modus Aktivieren",
+                enable_highlighting: "Schlüsselwörter hervorheben",
                 auto_update_dict: "Auto-Update-Wörterbuch von GitHub",
                 sync_status_ok: "Sync-Status: Aktualisiert",
                 sync_status_error: "Sync-Status: Fehler",
@@ -180,6 +184,7 @@
             ui: {
                 settings_title: "Paramètres de Langue",
                 enable_filtering: "Activer le Mode Recherche d'Emploi",
+                enable_highlighting: "Mettre en évidence les mots-clés",
                 auto_update_dict: "Mise à jour auto des mots-clés (GitHub)",
                 sync_status_ok: "Statut: Mis à jour",
                 sync_status_error: "Statut: Erreur",
@@ -202,6 +207,7 @@
             ui: {
                 settings_title: "语言设置",
                 enable_filtering: "启用求职模式",
+                enable_highlighting: "突出显示关键词",
                 auto_update_dict: "从GitHub自动更新关键词",
                 sync_status_ok: "同步状态: 已更新",
                 sync_status_error: "同步状态: 错误",
@@ -229,6 +235,7 @@
             const defaultLang = supportedLangs.includes(browserLang) ? browserLang : 'en';
 
             this.config = {
+                highlightKeywords: GM_getValue('ljsm_highlight_keywords', false),
                 autoUpdateDict: GM_getValue('ljsm_auto_update_dict', true),
                 uiLang: GM_getValue('ljsm_uiLang', defaultLang),
                 filterLangs: GM_getValue('ljsm_filterLangs', [defaultLang, 'en'])
@@ -236,6 +243,7 @@
         }
 
         save(config) {
+            GM_setValue('ljsm_highlight_keywords', config.highlightKeywords);
             GM_setValue('ljsm_auto_update_dict', config.autoUpdateDict);
             GM_setValue('ljsm_uiLang', config.uiLang);
             GM_setValue('ljsm_filterLangs', config.filterLangs);
@@ -279,6 +287,10 @@
             this.strongPosRegex = strongPosKeywords.length > 0 ? new RegExp(`(?:${strongPosKeywords.join('|')})`, 'i') : null;
             this.posRegex = new RegExp(`(?:${posKeywords.join('|')})`, 'i');
             this.negRegex = new RegExp(`(?:${negKeywords.join('|')})`, 'i');
+
+            this.strongPosRegexG = strongPosKeywords.length > 0 ? new RegExp(`(${strongPosKeywords.join('|')})`, 'ig') : null;
+            this.posRegexG = new RegExp(`(${posKeywords.join('|')})`, 'ig');
+            this.negRegexG = new RegExp(`(${negKeywords.join('|')})`, 'ig');
         }
 
         t(key) {
@@ -391,6 +403,29 @@
             title.textContent = this.i18n.t('settings_title');
             applyStyles(title, { margin: '0', fontSize: '20px', color: '#000000', fontWeight: 'bold' });
             modal.appendChild(title);
+            
+            // Highlight Keywords Toggle
+            const highlightGroup = document.createElement('div');
+            applyStyles(highlightGroup, { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' });
+            
+            const highlightLabel = document.createElement('label');
+            highlightLabel.textContent = this.i18n.t('enable_highlighting');
+            highlightLabel.style.fontWeight = 'bold';
+            highlightLabel.style.cursor = 'pointer';
+            
+            const highlightToggle = document.createElement('input');
+            highlightToggle.type = 'checkbox';
+            highlightToggle.checked = config.highlightKeywords;
+            highlightToggle.style.width = '18px';
+            highlightToggle.style.height = '18px';
+            highlightToggle.style.cursor = 'pointer';
+            
+            highlightLabel.onclick = () => highlightToggle.click();
+            
+            highlightGroup.appendChild(highlightLabel);
+            highlightGroup.appendChild(highlightToggle);
+            modal.appendChild(highlightGroup);
+
             
             // Auto Update Toggle
             const updateGroup = document.createElement('div');
@@ -506,6 +541,7 @@
                 const uiLang = uiLangSelect.value;
                 const filterLangs = checkboxes.filter(cb => cb.checked).map(cb => cb.value);
                 
+                config.highlightKeywords = highlightToggle.checked;
                 config.autoUpdateDict = autoUpdateToggle.checked;
                 config.uiLang = uiLang;
                 config.filterLangs = filterLangs;
@@ -600,6 +636,82 @@
                 postNode.classList.add('livf-collapsed');
                 postNode.style.border = 'none';
             }
+
+            if (this.i18n.config.highlightKeywords) {
+                this.highlightTextNodes(postNode);
+            }
+        }
+
+        createHighlightedNodes(text) {
+            let result = [document.createTextNode(text)];
+            
+            const applyRegex = (regex, style) => {
+                if (!regex) return;
+                for (let i = 0; i < result.length; i++) {
+                    const node = result[i];
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        const str = node.nodeValue;
+                        const matches = [...str.matchAll(regex)];
+                        if (matches.length > 0) {
+                            const newNodes = [];
+                            let lastIndex = 0;
+                            for (const match of matches) {
+                                const matchIndex = match.index;
+                                if (matchIndex > lastIndex) {
+                                    newNodes.push(document.createTextNode(str.substring(lastIndex, matchIndex)));
+                                }
+                                const span = document.createElement('span');
+                                span.className = 'livf-highlight';
+                                Object.assign(span.style, style);
+                                span.textContent = match[0];
+                                newNodes.push(span);
+                                lastIndex = matchIndex + match[0].length;
+                            }
+                            if (lastIndex < str.length) {
+                                newNodes.push(document.createTextNode(str.substring(lastIndex)));
+                            }
+                            result.splice(i, 1, ...newNodes);
+                            i += newNodes.length - 1;
+                        }
+                    }
+                }
+            };
+
+            applyRegex(this.i18n.strongPosRegexG, { color: '#057642', fontWeight: 'bold', fontStyle: 'italic' });
+            applyRegex(this.i18n.posRegexG, { color: '#057642', fontStyle: 'italic' });
+            applyRegex(this.i18n.negRegexG, { color: '#cc0000', fontStyle: 'italic' });
+
+            return result;
+        }
+
+        highlightTextNodes(postNode) {
+            const walker = document.createTreeWalker(postNode, NodeFilter.SHOW_TEXT, {
+                acceptNode: (node) => {
+                    const parent = node.parentNode;
+                    if (!parent) return NodeFilter.FILTER_REJECT;
+                    const tag = parent.tagName;
+                    if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT') return NodeFilter.FILTER_REJECT;
+                    if (parent.classList && parent.classList.contains('livf-highlight')) return NodeFilter.FILTER_REJECT;
+                    return NodeFilter.FILTER_ACCEPT;
+                }
+            });
+
+            const textNodes = [];
+            let node;
+            while ((node = walker.nextNode())) {
+                if (node.nodeValue.trim()) {
+                    textNodes.push(node);
+                }
+            }
+
+            textNodes.forEach(textNode => {
+                const newNodes = this.createHighlightedNodes(textNode.nodeValue);
+                if (newNodes.length > 1) { 
+                    const fragment = document.createDocumentFragment();
+                    newNodes.forEach(n => fragment.appendChild(n));
+                    textNode.parentNode.replaceChild(fragment, textNode);
+                }
+            });
         }
 
         processFeed() {

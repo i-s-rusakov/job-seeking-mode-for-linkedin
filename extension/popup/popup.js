@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveBtn = document.getElementById('livf-save-btn');
     const saveStatus = document.getElementById('save-status');
     const enableToggle = document.getElementById('livf-enable-toggle');
+    const highlightToggle = document.getElementById('livf-highlight-toggle');
     const autoUpdateToggle = document.getElementById('livf-auto-update-toggle');
     const forceUpdateBtn = document.getElementById('livf-force-update-btn');
     const syncStatusEl = document.getElementById('sync-status');
@@ -17,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load settings from Chrome Sync Storage
     chrome.storage.sync.get({
         ljsm_enabled: true,
+        ljsm_highlight_keywords: false,
         ljsm_auto_update_dict: true,
         ljsm_sync_status: 'ok',
         ljsm_sync_needs_reload: false,
@@ -24,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ljsm_filterLangs: [defaultLang, 'en']
     }, (items) => {
         enableToggle.checked = items.ljsm_enabled;
+        highlightToggle.checked = items.ljsm_highlight_keywords;
         autoUpdateToggle.checked = items.ljsm_auto_update_dict;
         currentUiLang = items.ljsm_uiLang;
         const filterLangs = [...new Set(items.ljsm_filterLangs)];
@@ -38,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Apply translations
         document.getElementById('settings-title').textContent = uiDict.settings_title;
         document.getElementById('enable-filtering-label').textContent = uiDict.enable_filtering;
+        document.getElementById('enable-highlighting-label').textContent = uiDict.enable_highlighting;
         document.getElementById('auto-update-dict-label').textContent = uiDict.auto_update_dict;
         document.getElementById('ui-language-label').textContent = uiDict.ui_language;
         document.getElementById('filter-languages-label').textContent = uiDict.filter_languages;
@@ -102,6 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const settings = {
             ljsm_enabled: enableToggle.checked,
+            ljsm_highlight_keywords: highlightToggle.checked,
             ljsm_auto_update_dict: autoUpdateToggle.checked,
             ljsm_uiLang: uiLang,
             ljsm_filterLangs: filterLangs
